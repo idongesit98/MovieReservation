@@ -1,0 +1,43 @@
+{
+  "name": "movie-reservation",
+  "version": "1.0.0",
+  "description": "Movie Reservation Api ",
+  "keywords": [
+    "Movie",
+    "Api",
+    "Reservation",
+    "Api",
+    "Movie-Reservation"
+  ],
+  "license": "ISC",
+  "author": "Idongesit Samuel",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npm run build && node dist/src/server.js --",
+    "dev": "nodemon --exec ts-node src/server.ts",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/morgan": "^1.9.10",
+    "@types/node": "^24.3.0",
+    "prisma": "^6.15.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.15.0",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "express-rate-limiter": "^1.3.1",
+    "joi": "^18.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.1",
+    "redis": "^5.8.2"
+  }
+}

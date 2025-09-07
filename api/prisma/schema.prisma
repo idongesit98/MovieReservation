@@ -1,0 +1,169 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String        @id @default(uuid())
+  firstname   String
+  lastname    String
+  dob         DateTime?
+  email       String        @unique
+  role        UserRole      @default(USER)
+  password    String
+  createdAt  DateTime      @default(now())
+  updated_at  DateTime      @updatedAt
+  deleted_at  DateTime?
+  Reservation Reservation[]
+
+  @@map("users")
+}
+
+model Movie {
+  id           String     @id @default(uuid())
+  title        String @unique
+  description  String
+  genre        String
+  releasedDate DateTime?
+  rating       String
+  duration     Int
+  language     String
+  showtime     ShowTime[]
+  created_at   DateTime   @default(now())
+  updated_at   DateTime   @updatedAt
+  deleted_at   DateTime?
+  @@map("movies")
+}
+
+model Theatre {
+  id           String    @id @default(uuid())
+  theatre_name String @unique
+  location     String
+  contact_info String
+  auditorium      Auditorium[]
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  deleted_at   DateTime?
+  @@map("theatres")
+}
+
+model Auditorium {
+  id         String     @id @default(uuid())
+  theatre_id String
+  name       String @unique
+  capacity   Int
+  seatLayout Json
+  theatre    Theatre    @relation(fields: [theatre_id], references: [id], onDelete: Cascade)
+  seats       Seat[]
+  showtimes   ShowTime[]
+  created_at DateTime   @default(now())
+  updated_at DateTime   @updatedAt
+  deleted_at DateTime?
+  @@map("auditorium")
+  @@unique([theatre_id,name])
+}
+
+model Seat {
+  id               String            @id @default(uuid())
+  screen_id        String
+  row              Int
+  number           Int
+  auditorium       Auditorium            @relation(fields: [screen_id], references: [id], onDelete: Cascade)
+  type             Type              @default(Regular)
+  price            Int
+  reservation_seat ReservationSeat[]
+  created_at       DateTime          @default(now())
+  updated_at       DateTime          @updatedAt
+  deleted_at       DateTime?
+  @@map("seats")
+}
+
+model ShowTime {
+  id         String    @id @default(uuid())
+  movie_id   String
+  movie      Movie     @relation(fields: [movie_id], references: [id], onDelete: Cascade)
+  screen_id  String
+  auditorium   Auditorium    @relation(fields: [screen_id], references: [id], onDelete: Cascade)
+  startTime  DateTime
+  endTime    DateTime
+  price      Int
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+  Reservation Reservation[]
+  @@map("showtime")
+}
+
+model Reservation {
+  id               String            @id @default(uuid())
+  user_id          String
+  showtime_id      String
+  status           ReservationStatus @default(Pending)
+  user             User              @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  showtime         ShowTime          @relation(fields: [showtime_id], references: [id], onDelete: Cascade)
+  bookingReference String            @unique @default(uuid())
+  reservation_seat ReservationSeat[]
+  payment          Payment[]
+  created_at       DateTime          @default(now())
+  updated_at       DateTime          @updatedAt
+  deleted_at       DateTime?
+  @@map("reservation")
+}
+
+model ReservationSeat {
+  id             String      @id @default(uuid())
+  reservation_id String
+  seat_id        String
+  reservation    Reservation @relation(fields: [reservation_id], references: [id], onDelete: Cascade)
+  seat           Seat        @relation(fields: [seat_id], references: [id], onDelete: Cascade)
+  created_at     DateTime    @default(now())
+  updated_at     DateTime    @updatedAt
+  deleted_at     DateTime?
+  @@map("reservation_seat")
+}
+
+model Payment {
+  id             String        @id @default(uuid())
+  reservation_id String
+  reservation    Reservation   @relation(fields: [reservation_id], references: [id], onDelete: Cascade)
+  amount         Int
+  status         PaymentStatus @default(Pending)
+  method         String
+  transactionRef String
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
+  deleted_at     DateTime?
+  @@map("payment")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum Type {
+  Vip
+  Regular
+}
+
+enum ReservationStatus {
+  Pending
+  Confirmed
+  Cancelled
+}
+
+enum PaymentStatus {
+  Pending
+  Confirmed
+  Cancelled
+}
