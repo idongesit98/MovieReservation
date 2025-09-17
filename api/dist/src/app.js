@@ -11,6 +11,11 @@ const redis_1 = require("./utils/config/redis");
 const database_1 = __importDefault(require("./utils/config/database"));
 const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
 const movieRoutes_1 = __importDefault(require("./routes/movieRoutes"));
+const theatreRoutes_1 = __importDefault(require("./routes/theatreRoutes"));
+const auditoriumRoutes_1 = __importDefault(require("./routes/auditoriumRoutes"));
+const seatRoutes_1 = __importDefault(require("./routes/seatRoutes"));
+const reservationRoutes_1 = __importDefault(require("./routes/reservationRoutes"));
+const showTimeRoutes_1 = __importDefault(require("./routes/showTimeRoutes"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 app.use((0, morgan_1.default)("dev"));
@@ -20,6 +25,11 @@ const API_PREFIX = process.env.API_PREFIX;
 const API_VERSION = process.env.API_VERSION;
 app.use(`${API_PREFIX}/${API_VERSION}/auth`, authRoutes_1.default);
 app.use(`${API_PREFIX}/${API_VERSION}/movie`, movieRoutes_1.default);
+app.use(`${API_PREFIX}/${API_VERSION}/theatre`, theatreRoutes_1.default);
+app.use(`${API_PREFIX}/${API_VERSION}/auditorium`, auditoriumRoutes_1.default);
+app.use(`${API_PREFIX}/${API_VERSION}/seat`, seatRoutes_1.default);
+app.use(`${API_PREFIX}/${API_VERSION}/reservation`, reservationRoutes_1.default);
+app.use(`${API_PREFIX}/${API_VERSION}/showtime`, showTimeRoutes_1.default);
 const initApp = async () => {
     try {
         await (0, redis_1.connectRedis)();

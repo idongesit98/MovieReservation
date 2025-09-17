@@ -1,7 +1,7 @@
 import prisma from "../utils/config/database";
 import { errorResponse, successResponse } from "../utils/config/responseFormat";
 
-export const createTheatre = async(theatre_name:string,location:string,contactInfo:string) =>{
+export const createTheatre = async(theatre_name:string,location:string,contact_info:string) =>{
     try {
         const existing = await prisma.theatre.findUnique({where:{theatre_name}})
         if(existing){
@@ -11,7 +11,7 @@ export const createTheatre = async(theatre_name:string,location:string,contactIn
             data:{
                 theatre_name:theatre_name,
                 location:location,
-                contact_info:contactInfo
+                contact_info:contact_info
             }
         })
         return successResponse(201,"Theatre created succcessfully",{Theatre:newTheatre})

@@ -6,6 +6,10 @@ import prisma from "./utils/config/database";
 import authRoutes from './routes/authRoutes';
 import movieRoutes from './routes/movieRoutes';
 import theatreRoutes from './routes/theatreRoutes'
+import auditoriumRoutes from './routes/auditoriumRoutes'
+import seatRoute from './routes/seatRoutes'
+import reservationRoute from './routes/reservationRoutes';
+import showtimeRoutes from './routes/showTimeRoutes';
 
 dotenv.config()
 
@@ -21,6 +25,10 @@ const API_VERSION = process.env.API_VERSION
 app.use(`${API_PREFIX}/${API_VERSION}/auth`,authRoutes)
 app.use(`${API_PREFIX}/${API_VERSION}/movie`,movieRoutes)
 app.use(`${API_PREFIX}/${API_VERSION}/theatre`,theatreRoutes);
+app.use(`${API_PREFIX}/${API_VERSION}/auditorium`,auditoriumRoutes);
+app.use(`${API_PREFIX}/${API_VERSION}/seat`,seatRoute);
+app.use(`${API_PREFIX}/${API_VERSION}/reservation`,reservationRoute);
+app.use(`${API_PREFIX}/${API_VERSION}/showtime`,showtimeRoutes);
 
 export const initApp = async() => {
     try {

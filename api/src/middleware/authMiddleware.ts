@@ -34,17 +34,17 @@ export const authenticate = async(req:Request,res:Response,next:NextFunction) =>
 };
 
 export const authorize = (roles:string[]) =>{
-     (req:Request,res:Response,next:NextFunction) =>{
+     return (req:Request,res:Response,next:NextFunction) =>{
         // const user = req.user as {role:string};
 
         // if (!roles.includes(user.role)) {
-        //     res.status(403).json({error:"Access Denied"});
+        //     return res.status(403).json({error:"Access Denied"});
         // }
         const user = req.user;
         if (!user || !roles.includes(user.role)) {
-            return res.status(403).json({error:"Access denied"})
+            res.status(403).json({error:"Access denied"})
+            return;
         }
         next();
     };
-    return;
 }

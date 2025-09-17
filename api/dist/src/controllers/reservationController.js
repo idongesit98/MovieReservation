@@ -32,18 +32,26 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = __importDefault(require("express"));
-const controller = __importStar(require("../controllers/movieController"));
-const authMiddleware_1 = require("../middleware/authMiddleware");
-const router = express_1.default.Router();
-router.post("/add-movie", authMiddleware_1.authenticate, controller.addMovies);
-router.get("/:movieId/single", controller.singleMovies);
-router.get("/all-movie", authMiddleware_1.authenticate, controller.allMovies);
-router.post("/:movieId/update", authMiddleware_1.authenticate, (0, authMiddleware_1.authorize)([]), controller.movieUpdate);
-router.delete("/:id", authMiddleware_1.authenticate, authMiddleware_1.authorize, controller.movieDeleted);
-router.get("/search", controller.moviesSearch);
-exports.default = router;
+exports.getReserv = exports.cancelReserv = exports.createReserv = void 0;
+const service = __importStar(require("../services/reservationServices"));
+const createReserv = async (req, res) => {
+    const userId = req.user?.id;
+    const { showtimeId, seatsIds } = req.body;
+    const response = await service.createReservation(userId, showtimeId, seatsIds);
+    res.status(response.code).json(response);
+};
+exports.createReserv = createReserv;
+const cancelReserv = async (req, res) => {
+    const userId = req.user?.id;
+    const { reservationId } = req.params;
+    const response = await service.cancelReservation(userId, reservationId);
+    res.status(response.code).json(response);
+};
+exports.cancelReserv = cancelReserv;
+const getReserv = async (req, res) => {
+    const { bookingRef } = req.params;
+    const response = await service.getReservationByReference(bookingRef);
+    res.status(response.code).json(response);
+};
+exports.getReserv = getReserv;

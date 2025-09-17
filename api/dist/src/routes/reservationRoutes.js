@@ -37,13 +37,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const controller = __importStar(require("../controllers/movieController"));
+const controller = __importStar(require("../controllers/reservationController"));
 const authMiddleware_1 = require("../middleware/authMiddleware");
 const router = express_1.default.Router();
-router.post("/add-movie", authMiddleware_1.authenticate, controller.addMovies);
-router.get("/:movieId/single", controller.singleMovies);
-router.get("/all-movie", authMiddleware_1.authenticate, controller.allMovies);
-router.post("/:movieId/update", authMiddleware_1.authenticate, (0, authMiddleware_1.authorize)([]), controller.movieUpdate);
-router.delete("/:id", authMiddleware_1.authenticate, authMiddleware_1.authorize, controller.movieDeleted);
-router.get("/search", controller.moviesSearch);
+router.post("/create", authMiddleware_1.authenticate, (0, authMiddleware_1.authorize)(["ADMIN"]), controller.createReserv);
+router.post("/:reservationId/cancel", authMiddleware_1.authenticate, (0, authMiddleware_1.authorize)(["ADMIN"]), controller.cancelReserv);
+router.get("/:bookingRef/bookings", authMiddleware_1.authenticate, (0, authMiddleware_1.authorize)(["ADMIN"]), controller.getReserv);
 exports.default = router;

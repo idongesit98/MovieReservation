@@ -26,6 +26,38 @@ export const loginSchema = Joi.object({
   password: Joi.string().required(),
 });
 
+export const theatreSchema = Joi.object({
+  theatre_name: Joi.string().min(3).max(100).required(),
+  location: Joi.string().min(3).max(200).required(),
+  contact_info: Joi.string()
+    .pattern(/^[0-9+\-() ]+$/) 
+    .required(),
+});
+
+export const updateTheatreSchema = Joi.object({
+  theatre_name: Joi.string().min(3).max(100),
+  location: Joi.string().min(3).max(200),
+  contact_info: Joi.string().pattern(/^[0-9+\-() ]+$/),
+}).min(1);
+
+export const createAuditoriumSchema = Joi.object({
+  theatreId: Joi.string().uuid().required(),
+  name: Joi.string().min(2).max(100).required(),
+  capacity: Joi.number().integer().min(1).required(),
+  seatLayout: Joi.object({
+    rows: Joi.number().integer().min(1).required(),
+    columns: Joi.number().integer().min(1).required(),
+    seats: Joi.array()
+      .items(
+        Joi.object({
+          row: Joi.number().integer().min(1).required(),
+          column: Joi.number().integer().min(1).required(),
+          status: Joi.string().valid("available", "booked", "reserved").default("available")
+        })
+      )
+      .required()
+  }).required()
+});
 
 export const validate = (schema: Joi.ObjectSchema) =>
   (req: Request, res: Response, next: NextFunction) => {

@@ -37,13 +37,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const controller = __importStar(require("../controllers/movieController"));
+const controller = __importStar(require("../controllers/auditoriumController"));
 const authMiddleware_1 = require("../middleware/authMiddleware");
 const router = express_1.default.Router();
-router.post("/add-movie", authMiddleware_1.authenticate, controller.addMovies);
-router.get("/:movieId/single", controller.singleMovies);
-router.get("/all-movie", authMiddleware_1.authenticate, controller.allMovies);
-router.post("/:movieId/update", authMiddleware_1.authenticate, (0, authMiddleware_1.authorize)([]), controller.movieUpdate);
-router.delete("/:id", authMiddleware_1.authenticate, authMiddleware_1.authorize, controller.movieDeleted);
-router.get("/search", controller.moviesSearch);
+//The availability routes and update needs to be checked. for availability when showtime id is created for update individial updated should be allowed
+router.post("/:theatre_id/add-torium", authMiddleware_1.authenticate, (0, authMiddleware_1.authorize)(["ADMIN"]), controller.addAuditorium);
+router.get("/:theatreId/by-theatre", authMiddleware_1.authenticate, controller.auditoriumByTheatre);
+router.get("/:auditoriumId/:showtimeId/avail", authMiddleware_1.authenticate, controller.availability);
+router.get("/admin-report/:theatre_id", authMiddleware_1.authenticate, (0, authMiddleware_1.authorize)(["ADMIN"]), controller.adminReports);
+router.post("/:auditoriumId/update-auditorium", authMiddleware_1.authenticate, (0, authMiddleware_1.authorize)(["ADMIN"]), controller.auditoriumUpdate);
 exports.default = router;

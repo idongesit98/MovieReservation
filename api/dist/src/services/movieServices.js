@@ -127,7 +127,7 @@ const deleteMovie = async (movieId) => {
             return (0, responseFormat_1.errorResponse)(404, "movie not found", null);
         }
         await database_1.default.movie.delete({ where: { id: movieId } });
-        return (0, responseFormat_1.successResponse)(200, "Movie deleted succesffully", null);
+        return (0, responseFormat_1.successResponse)(200, "Movie deleted succesffully", { Deleted: movie });
     }
     catch (error) {
         console.error("Delete Movie Error", error);

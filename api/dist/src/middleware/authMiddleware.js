@@ -33,17 +33,17 @@ const authenticate = async (req, res, next) => {
 };
 exports.authenticate = authenticate;
 const authorize = (roles) => {
-    (req, res, next) => {
+    return (req, res, next) => {
         // const user = req.user as {role:string};
         // if (!roles.includes(user.role)) {
-        //     res.status(403).json({error:"Access Denied"});
+        //     return res.status(403).json({error:"Access Denied"});
         // }
         const user = req.user;
         if (!user || !roles.includes(user.role)) {
             res.status(403).json({ error: "Access denied" });
+            return;
         }
         next();
     };
-    return;
 };
 exports.authorize = authorize;

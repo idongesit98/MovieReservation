@@ -129,6 +129,7 @@ model ReservationSeat {
   created_at     DateTime    @default(now())
   updated_at     DateTime    @updatedAt
   deleted_at     DateTime?
+  cancelled_at  DateTime?
   @@map("reservation_seat")
 }
 
