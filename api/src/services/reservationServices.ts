@@ -3,6 +3,11 @@ import { errorResponse, successResponse } from "../utils/config/responseFormat";
 
 export const createReservation = async(userId:string,showtimeId:string,seatIds:string[]) =>{
     try {
+
+        if (!seatIds || !Array.isArray(seatIds) || seatIds.length === 0) {
+            return errorResponse(400,"Seat IDs are required",null)
+        }
+
         const showtime = await prisma.showTime.findUnique({where:{id:showtimeId}})
         if (!showtime) {
             return errorResponse(404,"Showtime not found",null);
@@ -38,33 +43,6 @@ export const createReservation = async(userId:string,showtimeId:string,seatIds:s
     }
 }
 
-export const cancelReservation = async(reservationId:string,userId:string) =>{
-    try {
-        const reservation = await prisma.reservation.findUnique({
-            where:{id:reservationId},
-            include:{reservation_seat:true},
-        });
-        if(!reservation) return errorResponse(404,"Reservation not found",null);
-        if (reservation.user_id !== userId) {
-            return errorResponse(403,"Unauthorized to cancel this reservation",null);
-        }
-
-        const cancelled = await prisma.reservation.update({
-            where:{id:reservationId},
-            data:{
-                status:"Cancelled",
-                reservation_seat:{
-                    updateMany:{where:{cancelled_at:null},data:{cancelled_at:new Date()}}
-                }
-            }
-        });
-        return successResponse(200,"Reservation cancelled successfully",{Reservation:cancelled})
-    } catch (error) {
-        console.error("Cancel reservation error",error)
-        return errorResponse(500,"Failed to cancel reservation",null,error);
-    }
-}
-
 export const getReservationByReference = async(bookingRef:string) =>{
     try {
         const reservation = await prisma.reservation.findUnique({
@@ -78,5 +56,24 @@ export const getReservationByReference = async(bookingRef:string) =>{
     } catch (error) {
         console.error("Get reservation error",error);
         return errorResponse(500,"Failed to fetch reservation",null,error);
+    }
+}
+
+export const getAllReservation = async() =>{
+    try {
+        const all = await prisma.reservation.findMany({
+            include:{
+                reservation_seat:true
+            },
+            orderBy:{created_at:"asc"}
+        })
+
+        if (all.length === 0) {
+            return errorResponse(404,"No reservation found",null)
+        }
+        return successResponse(200,"Reservation found",{Reservation:all})
+    } catch (error) {
+        console.error("Get Reservation",error)
+        return errorResponse(500,"Failed to SignUp User",null,error)
     }
 }

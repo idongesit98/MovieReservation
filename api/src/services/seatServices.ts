@@ -81,7 +81,6 @@ export const updateSeat = async (seatId: string,updates: { type?: "Vip" | "Regul
   }
 };
 
-
 // export const checkSeatAvailability = async (seatId: string) => {
 //   try {
 //     const seat = await prisma.seat.findUnique({
@@ -155,6 +154,7 @@ export const cancelReservation = async(reservationSeatId:string) =>{
     if (reservationSeat.cancelled_at) {
       return errorResponse(404,"Reservation already cancelled",null)
     }
+
     const cancelled = await prisma.reservationSeat.update({
       where:{id:reservationSeatId},
       data:{cancelled_at:new Date()}

@@ -3,11 +3,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getReservationByReference = exports.cancelReservation = exports.createReservation = void 0;
+exports.getAllReservation = exports.getReservationByReference = exports.createReservation = void 0;
 const database_1 = __importDefault(require("../utils/config/database"));
 const responseFormat_1 = require("../utils/config/responseFormat");
 const createReservation = async (userId, showtimeId, seatIds) => {
     try {
+        if (!seatIds || !Array.isArray(seatIds) || seatIds.length === 0) {
+            return (0, responseFormat_1.errorResponse)(400, "Seat IDs are required", null);
+        }
         const showtime = await database_1.default.showTime.findUnique({ where: { id: showtimeId } });
         if (!showtime) {
             return (0, responseFormat_1.errorResponse)(404, "Showtime not found", null);
@@ -42,34 +45,6 @@ const createReservation = async (userId, showtimeId, seatIds) => {
     }
 };
 exports.createReservation = createReservation;
-const cancelReservation = async (reservationId, userId) => {
-    try {
-        const reservation = await database_1.default.reservation.findUnique({
-            where: { id: reservationId },
-            include: { reservation_seat: true },
-        });
-        if (!reservation)
-            return (0, responseFormat_1.errorResponse)(404, "Reservation not found", null);
-        if (reservation.user_id !== userId) {
-            return (0, responseFormat_1.errorResponse)(403, "Unauthorized to cancel this reservation", null);
-        }
-        const cancelled = await database_1.default.reservation.update({
-            where: { id: reservationId },
-            data: {
-                status: "Cancelled",
-                reservation_seat: {
-                    updateMany: { where: { cancelled_at: null }, data: { cancelled_at: new Date() } }
-                }
-            }
-        });
-        return (0, responseFormat_1.successResponse)(200, "Reservation cancelled successfully", { Reservation: cancelled });
-    }
-    catch (error) {
-        console.error("Cancel reservation error", error);
-        return (0, responseFormat_1.errorResponse)(500, "Failed to cancel reservation", null, error);
-    }
-};
-exports.cancelReservation = cancelReservation;
 const getReservationByReference = async (bookingRef) => {
     try {
         const reservation = await database_1.default.reservation.findUnique({
@@ -86,3 +61,22 @@ const getReservationByReference = async (bookingRef) => {
     }
 };
 exports.getReservationByReference = getReservationByReference;
+const getAllReservation = async () => {
+    try {
+        const all = await database_1.default.reservation.findMany({
+            include: {
+                reservation_seat: true
+            },
+            orderBy: { created_at: "asc" }
+        });
+        if (all.length === 0) {
+            return (0, responseFormat_1.errorResponse)(404, "No reservation found", null);
+        }
+        return (0, responseFormat_1.successResponse)(200, "Reservation found", { Reservation: all });
+    }
+    catch (error) {
+        console.error("Get Reservation", error);
+        return (0, responseFormat_1.errorResponse)(500, "Failed to SignUp User", null, error);
+    }
+};
+exports.getAllReservation = getAllReservation;

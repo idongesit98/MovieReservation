@@ -36,6 +36,7 @@ export const getReport = async(req:Request,res:Response) =>{
 
 export const cancel = async(req:Request,res:Response) =>{
     const {reservationSeatId} = req.params
+    console.log("Reservess",reservationSeatId)
     const response = await service.cancelReservation(reservationSeatId)
     res.status(response.code).json(response)
 }

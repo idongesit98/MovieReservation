@@ -10,6 +10,7 @@ import auditoriumRoutes from './routes/auditoriumRoutes'
 import seatRoute from './routes/seatRoutes'
 import reservationRoute from './routes/reservationRoutes';
 import showtimeRoutes from './routes/showTimeRoutes';
+import paymentRoute from './routes/paymentRoutes'
 
 dotenv.config()
 
@@ -29,6 +30,7 @@ app.use(`${API_PREFIX}/${API_VERSION}/auditorium`,auditoriumRoutes);
 app.use(`${API_PREFIX}/${API_VERSION}/seat`,seatRoute);
 app.use(`${API_PREFIX}/${API_VERSION}/reservation`,reservationRoute);
 app.use(`${API_PREFIX}/${API_VERSION}/showtime`,showtimeRoutes);
+app.use(`${API_PREFIX}/${API_VERSION}/payment`,paymentRoute);
 
 export const initApp = async() => {
     try {

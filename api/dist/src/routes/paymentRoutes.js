@@ -37,10 +37,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const controller = __importStar(require("../controllers/reservationController"));
+const controller = __importStar(require("../controllers/paymentController"));
 const authMiddleware_1 = require("../middleware/authMiddleware");
-const router = express_1.default.Router();
-router.post("/create", authMiddleware_1.authenticate, (0, authMiddleware_1.authorize)(["ADMIN"]), controller.createReserv);
-router.get("/:bookingRef/bookings", authMiddleware_1.authenticate, (0, authMiddleware_1.authorize)(["ADMIN"]), controller.getReserv);
-router.get("/all", authMiddleware_1.authenticate, (0, authMiddleware_1.authorize)(["ADMIN"]), controller.getAllReserv);
-exports.default = router;
+const route = express_1.default.Router();
+route.post("/initiate-pay", authMiddleware_1.authenticate, (0, authMiddleware_1.authorize)(["ADMIN", "USER"]), controller.initiate);
+route.post("/verify", authMiddleware_1.authenticate, (0, authMiddleware_1.authorize)(["ADMIN", "USER"]), controller.verify);
+exports.default = route;

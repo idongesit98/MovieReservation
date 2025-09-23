@@ -69,6 +69,7 @@ const getReport = async (req, res) => {
 exports.getReport = getReport;
 const cancel = async (req, res) => {
     const { reservationSeatId } = req.params;
+    console.log("Reservess", reservationSeatId);
     const response = await service.cancelReservation(reservationSeatId);
     res.status(response.code).json(response);
 };

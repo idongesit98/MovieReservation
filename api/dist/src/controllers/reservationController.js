@@ -33,25 +33,23 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getReserv = exports.cancelReserv = exports.createReserv = void 0;
+exports.getAllReserv = exports.getReserv = exports.createReserv = void 0;
 const service = __importStar(require("../services/reservationServices"));
 const createReserv = async (req, res) => {
     const userId = req.user?.id;
-    const { showtimeId, seatsIds } = req.body;
-    const response = await service.createReservation(userId, showtimeId, seatsIds);
+    const { showtimeId, seatIds } = req.body;
+    const response = await service.createReservation(userId, showtimeId, seatIds);
     res.status(response.code).json(response);
 };
 exports.createReserv = createReserv;
-const cancelReserv = async (req, res) => {
-    const userId = req.user?.id;
-    const { reservationId } = req.params;
-    const response = await service.cancelReservation(userId, reservationId);
-    res.status(response.code).json(response);
-};
-exports.cancelReserv = cancelReserv;
 const getReserv = async (req, res) => {
     const { bookingRef } = req.params;
     const response = await service.getReservationByReference(bookingRef);
     res.status(response.code).json(response);
 };
 exports.getReserv = getReserv;
+const getAllReserv = async (req, res) => {
+    const response = await service.getAllReservation();
+    res.status(response.code).json(response);
+};
+exports.getAllReserv = getAllReserv;

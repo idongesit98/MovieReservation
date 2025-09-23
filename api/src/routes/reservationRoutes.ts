@@ -5,7 +5,8 @@ import { authenticate, authorize } from "../middleware/authMiddleware";
 const router = express.Router();
 
 router.post("/create",authenticate,authorize(["ADMIN"]),controller.createReserv)
-router.post("/:reservationId/cancel",authenticate,authorize(["ADMIN"]),controller.cancelReserv)
 router.get("/:bookingRef/bookings",authenticate,authorize(["ADMIN"]),controller.getReserv)
+router.get("/all",authenticate,authorize(["ADMIN"]),controller.getAllReserv)
+
 
 export default router;

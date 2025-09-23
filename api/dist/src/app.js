@@ -16,6 +16,7 @@ const auditoriumRoutes_1 = __importDefault(require("./routes/auditoriumRoutes"))
 const seatRoutes_1 = __importDefault(require("./routes/seatRoutes"));
 const reservationRoutes_1 = __importDefault(require("./routes/reservationRoutes"));
 const showTimeRoutes_1 = __importDefault(require("./routes/showTimeRoutes"));
+const paymentRoutes_1 = __importDefault(require("./routes/paymentRoutes"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 app.use((0, morgan_1.default)("dev"));
@@ -30,6 +31,7 @@ app.use(`${API_PREFIX}/${API_VERSION}/auditorium`, auditoriumRoutes_1.default);
 app.use(`${API_PREFIX}/${API_VERSION}/seat`, seatRoutes_1.default);
 app.use(`${API_PREFIX}/${API_VERSION}/reservation`, reservationRoutes_1.default);
 app.use(`${API_PREFIX}/${API_VERSION}/showtime`, showTimeRoutes_1.default);
+app.use(`${API_PREFIX}/${API_VERSION}/payment`, paymentRoutes_1.default);
 const initApp = async () => {
     try {
         await (0, redis_1.connectRedis)();
