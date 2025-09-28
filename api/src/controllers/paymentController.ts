@@ -12,3 +12,20 @@ export const verify = async(req:Request,res:Response) =>{
     const response = await verifyPay(reference)
     res.status(response.code).json(response)
 }
+
+export const paymentWebook = async(req:Request,res:Response) =>{
+    try {
+        const event = req.body;
+        
+        if (event.event === "charge.success") {
+            await verifyPay(event.data.reference)
+        } else if(event.event === "charge.failed"){
+            await verifyPay(event.data.reference)
+        }
+
+        res.sendStatus(200)
+    } catch (error) {
+        console.error("Webhook error:",error)
+        res.sendStatus(500);
+    }
+}

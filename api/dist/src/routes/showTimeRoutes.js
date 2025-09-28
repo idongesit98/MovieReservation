@@ -41,7 +41,7 @@ const showTimeController = __importStar(require("../controllers/showTimeControll
 const authMiddleware_1 = require("../middleware/authMiddleware");
 const router = express_1.default.Router();
 router.post("/create", authMiddleware_1.authenticate, (0, authMiddleware_1.authorize)(["ADMIN"]), showTimeController.createShow);
-router.get("/allShows", authMiddleware_1.authenticate, (0, authMiddleware_1.authorize)(["ADMIN"]), showTimeController.getAllShowsTimes);
+router.get("/allshows", authMiddleware_1.authenticate, (0, authMiddleware_1.authorize)(["ADMIN"]), showTimeController.getAllShowsTimes);
 router.get("/:showId/single", authMiddleware_1.authenticate, (0, authMiddleware_1.authorize)(["ADMIN"]), showTimeController.getShowById);
 router.put("/:showId/update", authMiddleware_1.authenticate, (0, authMiddleware_1.authorize)(["ADMIN"]), showTimeController.updateShow);
 router.delete("/:showId/delete", authMiddleware_1.authenticate, (0, authMiddleware_1.authorize)(["ADMIN"]), showTimeController.deleteShow);

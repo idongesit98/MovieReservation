@@ -34,7 +34,7 @@ export const createPayment = async(reservationId:string,amount:number,customerEm
 export const verifyPay = async(reference:string) =>{
     try {
         const response = await verifyPayment(reference)
-        const status = response.data.status === PaymentStatus.Confirmed ? PaymentStatus.Confirmed : PaymentStatus.Cancelled;
+        const status = response.data.status === "success" ? PaymentStatus.Confirmed : PaymentStatus.Cancelled;
 
         const payment = await prisma.payment.update({
             where:{transactionRef:reference},

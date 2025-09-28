@@ -6,19 +6,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteAuditorium = exports.updateAuditorium = exports.adminScreenReports = exports.getAuditoriumAvailabilty = exports.listAuditoriumsByTheatre = exports.createAuditorium = void 0;
 const database_1 = __importDefault(require("../utils/config/database"));
 const responseFormat_1 = require("../utils/config/responseFormat");
-const createAuditorium = async (theatre_id, name, capacity, seatLayout) => {
+const createAuditorium = async (theatreId, name, capacity, seatLayout) => {
     try {
-        const theatre = await database_1.default.theatre.findUnique({ where: { id: theatre_id } });
+        const theatre = await database_1.default.theatre.findUnique({ where: { id: theatreId } });
         if (!theatre) {
             return (0, responseFormat_1.errorResponse)(404, "Theatre not found", null);
         }
-        const existing = await database_1.default.auditorium.findFirst({ where: { theatre_id, name } });
+        const existing = await database_1.default.auditorium.findFirst({ where: { theatre_id: theatreId, name } });
         if (existing) {
             return (0, responseFormat_1.errorResponse)(400, "Auditorium already exists", null);
         }
         const auditorium = await database_1.default.auditorium.create({
             data: {
-                theatre_id,
+                theatre_id: theatreId,
                 name,
                 capacity,
                 seatLayout
@@ -82,10 +82,10 @@ const getAuditoriumAvailabilty = async (auditoriumId, showtimeId) => {
     }
 };
 exports.getAuditoriumAvailabilty = getAuditoriumAvailabilty;
-const adminScreenReports = async (theatre_id) => {
+const adminScreenReports = async (theatreId) => {
     try {
         const auditorium = await database_1.default.auditorium.findMany({
-            where: theatre_id ? { theatre_id } : {},
+            where: theatreId ? { theatre_id: theatreId } : {},
             include: {
                 showtimes: true,
                 seats: {

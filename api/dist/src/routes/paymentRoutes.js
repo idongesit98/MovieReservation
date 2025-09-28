@@ -42,4 +42,5 @@ const authMiddleware_1 = require("../middleware/authMiddleware");
 const route = express_1.default.Router();
 route.post("/initiate-pay", authMiddleware_1.authenticate, (0, authMiddleware_1.authorize)(["ADMIN", "USER"]), controller.initiate);
 route.post("/verify", authMiddleware_1.authenticate, (0, authMiddleware_1.authorize)(["ADMIN", "USER"]), controller.verify);
+route.post("/webhook", authMiddleware_1.authenticate, (0, authMiddleware_1.authorize)(["ADMIN", "USER"]), controller.paymentWebook);
 exports.default = route;

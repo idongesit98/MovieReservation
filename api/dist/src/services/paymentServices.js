@@ -38,7 +38,7 @@ exports.createPayment = createPayment;
 const verifyPay = async (reference) => {
     try {
         const response = await (0, paystack_1.verifyPayment)(reference);
-        const status = response.data.status === client_1.PaymentStatus.Confirmed ? client_1.PaymentStatus.Confirmed : client_1.PaymentStatus.Cancelled;
+        const status = response.data.status === "success" ? client_1.PaymentStatus.Confirmed : client_1.PaymentStatus.Cancelled;
         const payment = await database_1.default.payment.update({
             where: { transactionRef: reference },
             data: { status },

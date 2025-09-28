@@ -6,5 +6,6 @@ const route = express.Router();
 
 route.post("/initiate-pay",authenticate,authorize(["ADMIN","USER"]),controller.initiate)
 route.post("/verify",authenticate,authorize(["ADMIN","USER"]),controller.verify)
+route.post("/webhook",authenticate,authorize(["ADMIN","USER"]),controller.paymentWebook)
 
 export default route

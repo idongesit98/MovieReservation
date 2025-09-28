@@ -8,6 +8,10 @@ const database_1 = __importDefault(require("../utils/config/database"));
 const responseFormat_1 = require("../utils/config/responseFormat");
 const createMovies = async (title, description, genre, rating, duration, releasedDate, language) => {
     try {
+        const parsedDate = new Date(releasedDate);
+        if (isNaN(parsedDate.getTime())) {
+            return (0, responseFormat_1.errorResponse)(400, "Invalid releasedDate format", null);
+        }
         const existing = await database_1.default.movie.findUnique({ where: { title } });
         if (existing) {
             return (0, responseFormat_1.errorResponse)(400, "Movie already exists", null);
@@ -101,14 +105,16 @@ const updateMovie = async (movieId, title, description, email, genre, rating, du
 exports.updateMovie = updateMovie;
 const searchMovie = async (query) => {
     try {
+        const terms = query.split(" ");
         const movies = await database_1.default.movie.findMany({
             where: {
-                OR: [
-                    { title: { contains: query, mode: "insensitive" } },
-                    { genre: { contains: query, mode: "insensitive" } }
-                ]
+                OR: terms.flatMap((term) => [
+                    { title: { contains: term, mode: "insensitive" } },
+                    { genre: { contains: term, mode: "insensitive" } }
+                ])
             }
         });
+        console.log("Prisma results", movies);
         if (!movies.length) {
             return (0, responseFormat_1.errorResponse)(404, "No movies found", []);
         }

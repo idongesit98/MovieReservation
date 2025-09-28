@@ -3,8 +3,8 @@ import * as services from '../services/auditoriumServices'
 
 export const addAuditorium = async(req:Request,res:Response) =>{
     const {name,capacity,seatLayout} = req.body;
-    const {theatre_id} = req.params;
-    const response = await services.createAuditorium(theatre_id,name,capacity,seatLayout)
+    const {theatreId} = req.params;
+    const response = await services.createAuditorium(theatreId,name,capacity,seatLayout)
     res.status(response.code).json(response)
 }
 
@@ -21,8 +21,8 @@ export const availability = async(req:Request,res:Response) =>{
 }
 
 export const adminReports = async(req:Request,res:Response) =>{
-    const {theatre_id} = req.params;
-    const response = await services.adminScreenReports(theatre_id)
+    const {theatreId} = req.params;
+    const response = await services.adminScreenReports(theatreId)
     res.status(response.code).json(response)
 }
 export const auditoriumUpdate = async(req:Request,res:Response) =>{

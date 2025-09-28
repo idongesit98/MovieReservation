@@ -3,6 +3,12 @@ import { errorResponse, successResponse } from "../utils/config/responseFormat";
 
 export const createMovies = async(title:string,description:string,genre:string,rating:string,duration:number,releasedDate:Date,language:string)=>{
     try {
+
+        const parsedDate = new Date(releasedDate);
+        if (isNaN(parsedDate.getTime())) {
+        return errorResponse(400, "Invalid releasedDate format", null);
+        }
+
         const existing = await prisma.movie.findUnique({where:{title}})
         if (existing){
             return errorResponse(400,"Movie already exists",null)
@@ -94,14 +100,16 @@ export const updateMovie = async(movieId:string,title:string,description:string,
 
 export const searchMovie = async(query:string) =>{
     try {
+        const terms = query.split(" ");
         const movies = await prisma.movie.findMany({
             where:{
-                OR:[
-                    {title:{contains:query,mode:"insensitive"}},
-                    {genre:{contains:query,mode:"insensitive"}}
-                ]
+                OR:terms.flatMap((term)=>[
+                    {title:{contains:term,mode:"insensitive"}},
+                    {genre:{contains:term,mode:"insensitive"}}
+                ])
             }
         });
+        console.log("Prisma results",movies)
 
         if (!movies.length) {
             return errorResponse(404,"No movies found",[]);

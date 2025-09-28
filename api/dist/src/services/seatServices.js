@@ -82,38 +82,40 @@ const updateSeat = async (seatId, updates) => {
     }
 };
 exports.updateSeat = updateSeat;
-// export const checkSeatAvailability = async (seatId: string) => {
-//   try {
-//     const seat = await prisma.seat.findUnique({
-//       where: { id: seatId },
-//       include: { reservation_seat: true },
-//     });
-//     if (!seat) return errorResponse(404, "Seat not found", null);
-//     const isReserved = seat.reservation_seat.some((res) => res.cancelled_at === null);
-//     return successResponse(200, "Seat availability checked", {available: !isReserved,seat});
-//   } catch (error) {
-//     console.error("Check seat availability error", error);
-//     return errorResponse(500, "Failed to check seat availability", null, error);
-//   }
-// };
 const checkSeatAvailability = async (seatId) => {
-    const seats = await database_1.default.seat.findMany({
-        where: { screen_id: (await database_1.default.showTime.findUnique({ where: { id: seatId } }))?.screen_id },
-        include: {
-            reservation_seat: {
-                where: { reservation: { showtime_id: seatId, status: { not: "Cancelled" } } },
-            },
-        },
-    });
-    const availability = seats.map((seat) => ({
-        seat_id: seat.id,
-        row: seat.row,
-        number: seat.number,
-        status: seat.reservation_seat.length > 0 ? "Reserved" : "Available",
-    }));
-    return (0, responseFormat_1.successResponse)(200, "Seat availability", availability);
+    try {
+        const seat = await database_1.default.seat.findUnique({
+            where: { id: seatId },
+            include: { reservation_seat: true },
+        });
+        if (!seat)
+            return (0, responseFormat_1.errorResponse)(404, "Seat not found", null);
+        const isReserved = seat.reservation_seat.some((res) => res.cancelled_at === null);
+        return (0, responseFormat_1.successResponse)(200, "Seat availability checked", { available: !isReserved, seat });
+    }
+    catch (error) {
+        console.error("Check seat availability error", error);
+        return (0, responseFormat_1.errorResponse)(500, "Failed to check seat availability", null, error);
+    }
 };
 exports.checkSeatAvailability = checkSeatAvailability;
+// export const checkSeatAvailability = async (seatId: string) => {
+//   const seats = await prisma.seat.findMany({
+//     where: { screen_id: (await prisma.showTime.findUnique({ where: { id:seatId } }))?.screen_id },
+//     include: {
+//       reservation_seat: {
+//         where: { reservation: { showtime_id: seatId, status: { not: "Cancelled" } } },
+//       },
+//     },
+//   });
+//   const availability = seats.map((seat) => ({
+//     seat_id: seat.id,
+//     row: seat.row,
+//     number: seat.number,
+//     status: seat.reservation_seat.length > 0 ? "Reserved" : "Available",
+//   }));
+//   return successResponse(200, "Seat availability", availability);
+// };
 //checking seat report is it from seat or auditorium
 const getSeatReportForScreen = async (screenId) => {
     try {

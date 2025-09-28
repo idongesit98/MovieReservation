@@ -6,10 +6,10 @@ import { theatreSchema, updateTheatreSchema, validate } from "../middleware/Vali
 
 const router = express.Router();
 
-router.post("/add-theatre",authenticate,authorize(["ADMIN"]),validate(theatreSchema),controller.addTheatre);
-router.get("/:theatreId/single",controller.singleTheatre)
-router.get("/all-theatre",authenticate,controller.alltheatre)
-router.post("/:theatreId/update",authenticate,authorize(["ADMIN"]),validate(updateTheatreSchema),controller.theatreUpdate);
+router.post("/add-theatre",authenticate,authorize(["ADMIN","USER"]),validate(theatreSchema),controller.addTheatre);
+router.get("/:theatreId/single",authenticate,authorize(["ADMIN"]),controller.singleTheatre)
+router.get("/all-theatre",authenticate,authenticate,authorize(["ADMIN"]),controller.alltheatre)
+router.put("/:theatreId/update",authenticate,authorize(["ADMIN"]),validate(updateTheatreSchema),controller.theatreUpdate);
 router.delete("/:theatreId/delete",authenticate,authorize(["ADMIN"]),controller.theatreDeleted)
 
 export default router;

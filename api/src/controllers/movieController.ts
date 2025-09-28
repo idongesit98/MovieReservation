@@ -3,12 +3,7 @@ import * as service from '../services/movieServices';
 
 export const addMovies = async(req:Request,res:Response) =>{
    const {title,description,genre,rating,duration,releasedDate,language} = req.body
-
-   const parsedDate = new Date(`${releasedDate}T00:00:00.000Z`);
-    // if (isNaN(parsedDate.getTime())) {
-    //   return res.status(400).json({ message: "Invalid release date" });
-    // }
-   const response = await service.createMovies(title,description,genre,rating,duration,parsedDate,language)
+   const response = await service.createMovies(title,description,genre,rating,duration,releasedDate,language)
    res.status(response.code).json(response)
 }
 
@@ -32,6 +27,8 @@ export const movieUpdate = async(req:Request,res:Response) =>{
 
 export const moviesSearch = async (req: Request, res: Response) => {
   const { query } = req.query as { query?: string };
+  console.log("Query received:", req.query);
+
 
   if (!query) {
     return res.status(400).json({ message: "Search query is required" });

@@ -60,7 +60,7 @@ const updateShow = async (req, res) => {
 };
 exports.updateShow = updateShow;
 const deleteShow = async (req, res) => {
-    const showId = req.params.id;
+    const showId = req.params.showId;
     const response = await showtimeService.deleteShowTime(showId);
     res.status(response.code).json(response);
 };

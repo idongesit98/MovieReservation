@@ -2,20 +2,20 @@ import { Prisma } from "@prisma/client";
 import prisma from "../utils/config/database";
 import { errorResponse, successResponse } from "../utils/config/responseFormat";
 
-export const createAuditorium = async(theatre_id:string,name:string,capacity:number,seatLayout:Prisma.InputJsonValue)=>{
+export const createAuditorium = async(theatreId:string,name:string,capacity:number,seatLayout:Prisma.InputJsonValue)=>{
     try {
-        const theatre = await prisma.theatre.findUnique({where:{id:theatre_id}})
+        const theatre = await prisma.theatre.findUnique({where:{id:theatreId}})
         if (!theatre) {
             return errorResponse(404,"Theatre not found",null)
         }
-        const existing = await prisma.auditorium.findFirst({where:{theatre_id,name}})
+        const existing = await prisma.auditorium.findFirst({where:{theatre_id:theatreId,name}})
         if (existing) {
              return errorResponse(400,"Auditorium already exists",null)
         }
 
         const auditorium = await prisma.auditorium.create({
             data:{
-                theatre_id,
+                theatre_id:theatreId,
                 name,
                 capacity,
                 seatLayout
@@ -81,10 +81,10 @@ export const getAuditoriumAvailabilty = async(auditoriumId:string,showtimeId:str
     }
 }
 
-export const adminScreenReports = async(theatre_id?:string) =>{
+export const adminScreenReports = async(theatreId?:string) =>{
     try{
         const auditorium = await prisma.auditorium.findMany({
-            where:theatre_id? {theatre_id} : {},
+            where:theatreId? {theatre_id:theatreId} : {},
             include:{
                 showtimes:true,
                 seats:{

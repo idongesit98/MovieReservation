@@ -26,7 +26,7 @@ export const updateShow = async(req:Request,res:Response) =>{
 }
 
 export const deleteShow = async(req:Request,res:Response) =>{
-    const showId = req.params.id
+    const showId = req.params.showId
     const response = await showtimeService.deleteShowTime(showId)
     res.status(response.code).json(response)
 }

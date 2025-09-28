@@ -37,8 +37,8 @@ exports.auditoriumUpdate = exports.adminReports = exports.availability = exports
 const services = __importStar(require("../services/auditoriumServices"));
 const addAuditorium = async (req, res) => {
     const { name, capacity, seatLayout } = req.body;
-    const { theatre_id } = req.params;
-    const response = await services.createAuditorium(theatre_id, name, capacity, seatLayout);
+    const { theatreId } = req.params;
+    const response = await services.createAuditorium(theatreId, name, capacity, seatLayout);
     res.status(response.code).json(response);
 };
 exports.addAuditorium = addAuditorium;
@@ -55,8 +55,8 @@ const availability = async (req, res) => {
 };
 exports.availability = availability;
 const adminReports = async (req, res) => {
-    const { theatre_id } = req.params;
-    const response = await services.adminScreenReports(theatre_id);
+    const { theatreId } = req.params;
+    const response = await services.adminScreenReports(theatreId);
     res.status(response.code).json(response);
 };
 exports.adminReports = adminReports;

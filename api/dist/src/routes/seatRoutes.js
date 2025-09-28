@@ -42,7 +42,7 @@ const authMiddleware_1 = require("../middleware/authMiddleware");
 const router = express_1.default.Router();
 router.post("/:auditoriumId/generate", authMiddleware_1.authenticate, (0, authMiddleware_1.authorize)(["ADMIN"]), controller.generateSeat);
 router.get("/:auditoriumId/seats", authMiddleware_1.authenticate, (0, authMiddleware_1.authorize)(["ADMIN"]), controller.listSeats);
-router.post("/:seatId/update", authMiddleware_1.authenticate, (0, authMiddleware_1.authorize)(["ADMIN"]), controller.update);
+router.put("/:seatId/update", authMiddleware_1.authenticate, (0, authMiddleware_1.authorize)(["ADMIN"]), controller.update);
 router.get("/:seatId/avail", authMiddleware_1.authenticate, (0, authMiddleware_1.authorize)(["ADMIN"]), controller.seatAvail);
 router.get("/:screenId/report", authMiddleware_1.authenticate, (0, authMiddleware_1.authorize)(["ADMIN"]), controller.getReport);
 router.get("/:reservationSeatId/cancel", authMiddleware_1.authenticate, (0, authMiddleware_1.authorize)(["ADMIN"]), controller.cancel);

@@ -5,7 +5,7 @@ import { authenticate, authorize } from '../middleware/authMiddleware';
 const router = express.Router();
 
 router.post("/create",authenticate,authorize(["ADMIN"]),showTimeController.createShow );
-router.get("/allShows",authenticate,authorize(["ADMIN"]),showTimeController.getAllShowsTimes);
+router.get("/allshows",authenticate,authorize(["ADMIN"]),showTimeController.getAllShowsTimes);
 router.get("/:showId/single",authenticate,authorize(["ADMIN"]),showTimeController.getShowById);
 router.put("/:showId/update",authenticate,authorize(["ADMIN"]),showTimeController.updateShow);
 router.delete("/:showId/delete",authenticate,authorize(["ADMIN"]),showTimeController.deleteShow);
