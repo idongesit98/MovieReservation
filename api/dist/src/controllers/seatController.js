@@ -44,7 +44,9 @@ const generateSeat = async (req, res) => {
 exports.generateSeat = generateSeat;
 const listSeats = async (req, res) => {
     const { auditoriumId } = req.params;
-    const response = await service.listSeatsForScreen(auditoriumId);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const response = await service.listSeatsForScreen(auditoriumId, page, limit);
     res.status(response.code).json(response);
 };
 exports.listSeats = listSeats;
@@ -69,7 +71,6 @@ const getReport = async (req, res) => {
 exports.getReport = getReport;
 const cancel = async (req, res) => {
     const { reservationSeatId } = req.params;
-    console.log("Reservess", reservationSeatId);
     const response = await service.cancelReservation(reservationSeatId);
     res.status(response.code).json(response);
 };

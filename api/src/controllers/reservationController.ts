@@ -16,7 +16,10 @@ export const getReserv = async(req:Request,res:Response) =>{
 }
 
 export const getAllReserv = async(req:Request,res:Response) =>{
-    const response = await service.getAllReservation()
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10
+
+    const response = await service.getAllReservation(page,limit)
     res.status(response.code).json(response)
 }
 

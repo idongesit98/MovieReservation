@@ -49,7 +49,9 @@ const getReserv = async (req, res) => {
 };
 exports.getReserv = getReserv;
 const getAllReserv = async (req, res) => {
-    const response = await service.getAllReservation();
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const response = await service.getAllReservation(page, limit);
     res.status(response.code).json(response);
 };
 exports.getAllReserv = getAllReserv;

@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteTheatre = exports.updateTheatre = exports.getAllTheatres = exports.singleTheatre = exports.createTheatre = void 0;
 const database_1 = __importDefault(require("../utils/config/database"));
+const redis_1 = require("../utils/config/redis");
 const responseFormat_1 = require("../utils/config/responseFormat");
 const createTheatre = async (theatre_name, location, contact_info) => {
     try {
@@ -19,6 +20,7 @@ const createTheatre = async (theatre_name, location, contact_info) => {
                 contact_info: contact_info
             }
         });
+        await (0, redis_1.clearMovieCache)();
         return (0, responseFormat_1.successResponse)(201, "Theatre created succcessfully", { Theatre: newTheatre });
     }
     catch (error) {
@@ -46,9 +48,17 @@ const singleTheatre = async (theatreId) => {
     }
 };
 exports.singleTheatre = singleTheatre;
-const getAllTheatres = async () => {
+const getAllTheatres = async (page = 1, limit = 10) => {
     try {
+        const cacheKey = `movies:page:${page}:limit:${limit}`;
+        const cached = await redis_1.redisClient.get(cacheKey);
+        if (cached) {
+            return (0, responseFormat_1.successResponse)(200, "Theatres fetched from cache", JSON.parse(cached));
+        }
+        const skip = (page - 1) * limit;
         const all = await database_1.default.theatre.findMany({
+            skip,
+            take: limit,
             include: {
                 auditorium: true
             },
@@ -57,6 +67,7 @@ const getAllTheatres = async () => {
         if (all.length === 0) {
             return (0, responseFormat_1.errorResponse)(404, "No theatre found", null);
         }
+        await redis_1.redisClient.setEx(cacheKey, 300, JSON.stringify({ Theatre: all }));
         return (0, responseFormat_1.successResponse)(200, "Theatre found", { Theatre: { all } });
     }
     catch (error) {
@@ -79,6 +90,7 @@ const updateTheatre = async (theatreId, theatre_name, location, contactInfo) => 
                 contact_info: contactInfo
             }
         });
+        await (0, redis_1.clearMovieCache)();
         return (0, responseFormat_1.successResponse)(200, "Updated successfully", { UpdateTheatre: updatedTheatre });
     }
     catch (error) {
@@ -94,6 +106,7 @@ const deleteTheatre = async (theatreId) => {
             return (0, responseFormat_1.errorResponse)(404, "Theatre not found", null);
         }
         await database_1.default.theatre.delete({ where: { id: theatreId } });
+        await (0, redis_1.clearMovieCache)();
         return (0, responseFormat_1.successResponse)(200, "Theatre deleted successfully", { Deleted: theatre });
     }
     catch (error) {

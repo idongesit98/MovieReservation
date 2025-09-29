@@ -1,7 +1,19 @@
 services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    working_dir: /app
+    container_name: movie
+    ports:
+      - "9090:9090"  
+    env_file:
+      - ./api/.env
+    depends_on:
+      - postgres
+      - redis    
   postgres:
     image: postgres:latest
-    
     restart: always
     environment:
       POSTGRES_USER: reservationuser

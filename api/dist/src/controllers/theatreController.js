@@ -55,7 +55,9 @@ const theatreUpdate = async (req, res) => {
 };
 exports.theatreUpdate = theatreUpdate;
 const alltheatre = async (req, res) => {
-    const response = await service.getAllTheatres();
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const response = await service.getAllTheatres(page, limit);
     res.status(response.code).json(response);
 };
 exports.alltheatre = alltheatre;

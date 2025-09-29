@@ -21,7 +21,9 @@ export const theatreUpdate = async(req:Request,res:Response) =>{
 } 
 
 export const alltheatre = async(req:Request,res:Response) =>{
-    const response = await service.getAllTheatres()
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10
+    const response = await service.getAllTheatres(page,limit)
     res.status(response.code).json(response)
 }
 

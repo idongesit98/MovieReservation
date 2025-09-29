@@ -11,7 +11,9 @@ export const generateSeat = async(req:Request,res:Response) =>{
 
 export const listSeats = async(req:Request,res:Response) =>{
     const {auditoriumId} = req.params;
-    const response = await service.listSeatsForScreen(auditoriumId)
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10
+    const response = await service.listSeatsForScreen(auditoriumId,page,limit)
     res.status(response.code).json(response)
 }
 
@@ -36,7 +38,6 @@ export const getReport = async(req:Request,res:Response) =>{
 
 export const cancel = async(req:Request,res:Response) =>{
     const {reservationSeatId} = req.params
-    console.log("Reservess",reservationSeatId)
     const response = await service.cancelReservation(reservationSeatId)
     res.status(response.code).json(response)
 }

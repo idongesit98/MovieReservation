@@ -1,4 +1,5 @@
 import prisma from "../utils/config/database";
+import { clearMovieCache, redisClient } from "../utils/config/redis";
 import { errorResponse, successResponse } from "../utils/config/responseFormat";
 
 export const createMovies = async(title:string,description:string,genre:string,rating:string,duration:number,releasedDate:Date,language:string)=>{
@@ -24,6 +25,8 @@ export const createMovies = async(title:string,description:string,genre:string,r
                 language
             }
         })
+
+        await clearMovieCache();
         return successResponse(201,"Movie created successfully",{Movie:newMovie})
     } catch (error) {
         console.error("Creating movies Error",error)
@@ -51,9 +54,19 @@ export const getSingleMovies = async(movieId:string) =>{
         return errorResponse(500,"Failed to find single movie",null,errorMessage)
     }
 }
-export const getAllMovies = async() =>{
+export const getAllMovies = async(page:number = 1,limit:number = 10) =>{
     try {
+        const cacheKey = `movies:page:${page}:limit:${limit}`;
+
+        const cached = await redisClient.get(cacheKey)
+        if (cached) {
+            return successResponse(200,"Movies fetched from cache",JSON.parse(cached))
+        }
+
+        const skip = (page - 1) * limit;
         const all = await prisma.movie.findMany({
+            skip,
+            take:limit,
             include:{
                 showtime:true
             },
@@ -63,6 +76,7 @@ export const getAllMovies = async() =>{
         if (all.length === 0) {
             return errorResponse(404,"No movie found",null)
         }
+        await redisClient.setEx(cacheKey,300,JSON.stringify({Movies:all}))
         return successResponse(200,"Movies found",{Movies:all})
     } catch (error) {
         console.error("SignUp Error",error)
@@ -90,6 +104,7 @@ export const updateMovie = async(movieId:string,title:string,description:string,
                 language:language,
             }
         })
+         await clearMovieCache();
         return successResponse(200,"Updated successfully",{Updated:updatedMovie})
     } catch (error) {
         console.error("SignUp Error",error)
@@ -129,6 +144,8 @@ export const deleteMovie = async(movieId:string) =>{
             return errorResponse(404,"movie not found",null);
         }
         await prisma.movie.delete({where:{id:movieId}});
+        await clearMovieCache();
+
         return successResponse(200,"Movie deleted succesffully",{Deleted:movie})
     } catch (error) {
         console.error("Delete Movie Error", error);

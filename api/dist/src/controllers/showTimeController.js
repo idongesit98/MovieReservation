@@ -42,7 +42,9 @@ const createShow = async (req, res) => {
 };
 exports.createShow = createShow;
 const getAllShowsTimes = async (req, res) => {
-    const response = await showtimeService.getAllShowTimes(req.query);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const response = await showtimeService.getAllShowTimes(req.query, page, limit);
     res.status(response.code).json(response);
 };
 exports.getAllShowsTimes = getAllShowsTimes;

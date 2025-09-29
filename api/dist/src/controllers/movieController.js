@@ -48,7 +48,9 @@ const singleMovies = async (req, res) => {
 };
 exports.singleMovies = singleMovies;
 const allMovies = async (req, res) => {
-    const response = await service.getAllMovies();
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const response = await service.getAllMovies(page, limit);
     res.status(response.code).json(response);
 };
 exports.allMovies = allMovies;

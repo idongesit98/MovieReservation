@@ -14,7 +14,9 @@ export const singleMovies = async(req:Request,res:Response) =>{
 }
 
 export const allMovies = async(req:Request,res:Response) =>{
-    const response = await service.getAllMovies()
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10
+    const response = await service.getAllMovies(page,limit)
     res.status(response.code).json(response)
 }
 

@@ -7,6 +7,7 @@ exports.cancelReservation = exports.getSeatReportForScreen = exports.checkSeatAv
 const client_1 = require("@prisma/client");
 const database_1 = __importDefault(require("../utils/config/database"));
 const responseFormat_1 = require("../utils/config/responseFormat");
+const redis_1 = require("../utils/config/redis");
 const generateSeatForScreen = async (auditoriumId, seatLayout) => {
     try {
         const auditorium = await database_1.default.auditorium.findUnique({ where: { id: auditoriumId } });
@@ -48,15 +49,24 @@ const generateSeatForScreen = async (auditoriumId, seatLayout) => {
     }
 };
 exports.generateSeatForScreen = generateSeatForScreen;
-const listSeatsForScreen = async (auditoriumId) => {
+const listSeatsForScreen = async (auditoriumId, page = 1, limit = 10) => {
     try {
+        const cacheKey = `screen:page:${page}:limit:${limit}`;
+        const cached = await redis_1.redisClient.get(cacheKey);
+        if (cached) {
+            return (0, responseFormat_1.successResponse)(200, "Seat fetched from cache", JSON.parse(cached));
+        }
+        const skip = (page - 1) * limit;
         const seats = await database_1.default.seat.findMany({
+            skip,
+            take: limit,
             where: { screen_id: auditoriumId },
             orderBy: [{ row: 'asc' }, { number: "asc" }]
         });
         if (!seats || seats.length === 0) {
             return (0, responseFormat_1.errorResponse)(404, "No seats found for this auditorium", null);
         }
+        await redis_1.redisClient.setEx(cacheKey, 300, JSON.stringify({ Seat: seats }));
         return (0, responseFormat_1.successResponse)(200, "Seats fetched successfully", { Seats: seats });
     }
     catch (error) {
@@ -74,6 +84,7 @@ const updateSeat = async (seatId, updates) => {
             where: { id: seatId },
             data: { ...updates },
         });
+        await (0, redis_1.clearMovieCache)();
         return (0, responseFormat_1.successResponse)(200, "Seat updated successfully", { Seat: updated });
     }
     catch (error) {
@@ -138,7 +149,6 @@ const getSeatReportForScreen = async (screenId) => {
     }
 };
 exports.getSeatReportForScreen = getSeatReportForScreen;
-//make reservation then run api
 const cancelReservation = async (reservationSeatId) => {
     try {
         const reservationSeat = await database_1.default.reservationSeat.findUnique({

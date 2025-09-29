@@ -8,7 +8,7 @@ A backend service for managing movies, showtimes, seats, reservations, and payme
     - Schedule showtimes with automatic validation
 
 -   **Auditoriums & Seats**
-    - Static seat generation (Regular & VIP)
+    - Seat generation (Regular & VIP)
     - Seat availability check
     - Seat reports per screen
 
@@ -32,7 +32,7 @@ A backend service for managing movies, showtimes, seats, reservations, and payme
 # ⚙️Setup and Installation
 ## 1. Clone the Repo
 ```bash
-clone 
+clone https://github.com/idongesit98/MovieReservation.git
 cd project folder
 ```
 ## 2. Install Dependencies
@@ -103,6 +103,7 @@ npm run start
 - POST /api/v1/auth/logout → *Logout User*
 
 ## 🧪 Testing
+*Currently in progress*
 ```bash
 npm test
 ```

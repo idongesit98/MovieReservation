@@ -1,4 +1,5 @@
 import prisma from "../utils/config/database";
+import { clearMovieCache, redisClient } from "../utils/config/redis";
 import { errorResponse, successResponse } from "../utils/config/responseFormat";
 
 export const createTheatre = async(theatre_name:string,location:string,contact_info:string) =>{
@@ -14,6 +15,7 @@ export const createTheatre = async(theatre_name:string,location:string,contact_i
                 contact_info:contact_info
             }
         })
+        await clearMovieCache()
         return successResponse(201,"Theatre created succcessfully",{Theatre:newTheatre})
     } catch (error) {
         console.error("Create theatre Error", error);
@@ -39,9 +41,19 @@ export const singleTheatre = async(theatreId:string) =>{
     }
 }
 
-export const getAllTheatres = async() =>{
+export const getAllTheatres = async(page:number = 1,limit:number = 10) =>{
     try {
+        const cacheKey = `movies:page:${page}:limit:${limit}`;
+        
+        const cached = await redisClient.get(cacheKey)
+        if (cached) {
+            return successResponse(200,"Theatres fetched from cache",JSON.parse(cached))
+        }
+        
+        const skip = (page - 1) * limit;
         const all = await prisma.theatre.findMany({
+            skip,
+            take:limit,
             include:{
                 auditorium:true
             },
@@ -51,6 +63,7 @@ export const getAllTheatres = async() =>{
         if (all.length === 0) {
             return errorResponse(404,"No theatre found",null)
         }
+        await redisClient.setEx(cacheKey,300,JSON.stringify({Theatre:all}))
         return successResponse(200,"Theatre found",{Theatre:{all}})
     } catch (error) {
         console.error("All theatre error",error)
@@ -73,6 +86,7 @@ export const updateTheatre = async (theatreId:string,theatre_name:string,locatio
                 contact_info:contactInfo
             }
         })
+        await clearMovieCache();
         return successResponse(200,"Updated successfully",{UpdateTheatre:updatedTheatre})
     } catch (error) {
         console.error("Updated theatre error",error)
@@ -88,6 +102,7 @@ export const deleteTheatre = async(theatreId:string) =>{
         }
 
         await prisma.theatre.delete({where:{id:theatreId}});
+        await clearMovieCache()
         return successResponse(200,"Theatre deleted successfully",{Deleted:theatre})
     } catch (error) {
         console.error("Theatre deletion error",error)

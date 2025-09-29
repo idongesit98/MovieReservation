@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getAllReservation = exports.getReservationByReference = exports.createReservation = void 0;
 const database_1 = __importDefault(require("../utils/config/database"));
+const redis_1 = require("../utils/config/redis");
 const responseFormat_1 = require("../utils/config/responseFormat");
 const createReservation = async (userId, showtimeId, seatIds) => {
     try {
@@ -37,6 +38,7 @@ const createReservation = async (userId, showtimeId, seatIds) => {
             },
             include: { reservation_seat: true },
         });
+        await (0, redis_1.clearMovieCache)();
         return (0, responseFormat_1.successResponse)(201, "Reservation created successfully", { Reservation: reservation });
     }
     catch (error) {
@@ -61,9 +63,17 @@ const getReservationByReference = async (bookingRef) => {
     }
 };
 exports.getReservationByReference = getReservationByReference;
-const getAllReservation = async () => {
+const getAllReservation = async (page = 1, limit = 10) => {
     try {
+        const cacheKey = `reservation:page:${page}:limit:${limit}`;
+        const cached = await redis_1.redisClient.get(cacheKey);
+        if (cached) {
+            return (0, responseFormat_1.successResponse)(200, "Reservation fetched from cache", JSON.parse(cached));
+        }
+        const skip = (page - 1) * limit;
         const all = await database_1.default.reservation.findMany({
+            skip,
+            take: limit,
             include: {
                 reservation_seat: true
             },
@@ -72,6 +82,7 @@ const getAllReservation = async () => {
         if (all.length === 0) {
             return (0, responseFormat_1.errorResponse)(404, "No reservation found", null);
         }
+        await redis_1.redisClient.setEx(cacheKey, 300, JSON.stringify({ Reservation: all }));
         return (0, responseFormat_1.successResponse)(200, "Reservation found", { Reservation: all });
     }
     catch (error) {

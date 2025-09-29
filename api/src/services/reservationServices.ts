@@ -1,4 +1,5 @@
 import prisma from "../utils/config/database";
+import { clearMovieCache, redisClient } from "../utils/config/redis";
 import { errorResponse, successResponse } from "../utils/config/responseFormat";
 
 export const createReservation = async(userId:string,showtimeId:string,seatIds:string[]) =>{
@@ -36,6 +37,7 @@ export const createReservation = async(userId:string,showtimeId:string,seatIds:s
             },
             include:{reservation_seat:true},
         })
+        await clearMovieCache()
         return successResponse(201,"Reservation created successfully",{Reservation:reservation})
     } catch (error) {
         console.error("Create reservation error",error)
@@ -59,9 +61,18 @@ export const getReservationByReference = async(bookingRef:string) =>{
     }
 }
 
-export const getAllReservation = async() =>{
+export const getAllReservation = async(page:number = 1,limit:number = 10) =>{
     try {
+        const cacheKey = `reservation:page:${page}:limit:${limit}`;
+        const cached = await redisClient.get(cacheKey)
+
+        if (cached) {
+            return successResponse(200,"Reservation fetched from cache",JSON.parse(cached))
+        }
+        const skip = (page - 1) * limit;
         const all = await prisma.reservation.findMany({
+            skip,
+            take:limit,
             include:{
                 reservation_seat:true
             },
@@ -71,6 +82,7 @@ export const getAllReservation = async() =>{
         if (all.length === 0) {
             return errorResponse(404,"No reservation found",null)
         }
+        await redisClient.setEx(cacheKey,300,JSON.stringify({Reservation:all}))
         return successResponse(200,"Reservation found",{Reservation:all})
     } catch (error) {
         console.error("Get Reservation",error)

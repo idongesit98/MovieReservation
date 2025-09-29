@@ -8,7 +8,9 @@ export const createShow = async(req:Request,res:Response) =>{
 }
 
 export const getAllShowsTimes = async(req:Request,res:Response) =>{
-    const response = await showtimeService.getAllShowTimes(req.query);
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10
+    const response = await showtimeService.getAllShowTimes(req.query,page,limit);
     res.status(response.code).json(response)
 }
 

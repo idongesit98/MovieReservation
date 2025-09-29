@@ -1,6 +1,7 @@
 import { Type } from "@prisma/client";
 import prisma from "../utils/config/database";
 import { errorResponse, successResponse } from "../utils/config/responseFormat";
+import { clearMovieCache, redisClient } from "../utils/config/redis";
 
 export const generateSeatForScreen = async(auditoriumId:string,seatLayout:{rows:number;columns:number;vipRows?:number[]}) =>{
     try {
@@ -46,9 +47,19 @@ export const generateSeatForScreen = async(auditoriumId:string,seatLayout:{rows:
     }
 };
 
-export const listSeatsForScreen = async(auditoriumId:string) =>{
+export const listSeatsForScreen = async(auditoriumId:string,page:number = 1,limit:number = 10) =>{
     try {
+        const cacheKey = `screen:page:${page}:limit:${limit}`;
+
+        const cached = await redisClient.get(cacheKey)
+        if (cached) {
+            return successResponse(200,"Seat fetched from cache",JSON.parse(cached))
+        }
+         const skip = (page - 1) * limit;
+
         const seats = await prisma.seat.findMany({
+            skip,
+            take:limit,
             where:{screen_id:auditoriumId},
             orderBy:[{row:'asc'},{number:"asc"}]
         });
@@ -57,6 +68,7 @@ export const listSeatsForScreen = async(auditoriumId:string) =>{
             return errorResponse(404,"No seats found for this auditorium",null);
         }
 
+        await redisClient.setEx(cacheKey,300,JSON.stringify({Seat:seats}))
         return successResponse(200,"Seats fetched successfully",{Seats:seats});
     } catch (error) {
         console.error("List seats error",error);
@@ -73,7 +85,7 @@ export const updateSeat = async (seatId: string,updates: { type?: "Vip" | "Regul
       where: { id: seatId },
       data: { ...updates },
     });
-
+    await clearMovieCache();
     return successResponse(200, "Seat updated successfully", { Seat: updated });
   } catch (error) {
     console.error("Update seat error", error);
@@ -142,7 +154,7 @@ export const getSeatReportForScreen = async (screenId: string) => {
   }
 };
 
-//make reservation then run api
+
 export const cancelReservation = async(reservationSeatId:string) =>{
   try {
     const reservationSeat = await prisma.reservationSeat.findUnique({

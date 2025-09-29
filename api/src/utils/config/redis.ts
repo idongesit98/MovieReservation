@@ -22,3 +22,15 @@ export async function connectRedis(){
         console.error("Redis connection/test failed:", error)    
     }
 }
+
+export const clearMovieCache = async() =>{
+    try {
+        const keys = await redisClient.keys("movies");
+        if (keys.length > 0) {
+            await redisClient.del(keys)
+            console.log("Movie cache cleared:",keys);
+        }
+    } catch (error) {
+        console.error("Error clearing movie cache",error)
+    }
+}

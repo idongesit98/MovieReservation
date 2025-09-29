@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.redisClient = void 0;
+exports.clearMovieCache = exports.redisClient = void 0;
 exports.connectRedis = connectRedis;
 const redis_1 = require("redis");
 exports.redisClient = (0, redis_1.createClient)({
@@ -22,3 +22,16 @@ async function connectRedis() {
         console.error("Redis connection/test failed:", error);
     }
 }
+const clearMovieCache = async () => {
+    try {
+        const keys = await exports.redisClient.keys("movies");
+        if (keys.length > 0) {
+            await exports.redisClient.del(keys);
+            console.log("Movie cache cleared:", keys);
+        }
+    }
+    catch (error) {
+        console.error("Error clearing movie cache", error);
+    }
+};
+exports.clearMovieCache = clearMovieCache;
