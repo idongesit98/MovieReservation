@@ -58,7 +58,10 @@ npx prisma migrate dev
 npm run start
 ```
 # 📌 API ENDPOINTS
-
+# ⚾ BASE URL 
+```bash
+https://documenter.getpostman.com/view/30530080/2sB3QFQs99
+```
 ## 🎥 Movies
 - POST /api/v1/movies/add-movie → *Create movie*
 - GET /api/v1/movies/all-movies → *List movies*
